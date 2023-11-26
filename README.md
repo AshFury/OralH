@@ -1,4 +1,4 @@
-# Object Detection using YOLOv5 and Tensorflow.js
+# OralH - An oral hygiene monitor app
 
 <p align="center">
   <img src="./sample.png" />
