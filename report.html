@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#501733">
+    <title>OralH</title>
+    <link rel="stylesheet" href="src/master.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="images/logo.png"> 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <style>
+        html {
+            background-color: white;
+        }
+        body {
+            text-align: center; /* Center align text content */
+            overflow-y: auto; /* Add vertical scrollbar to body when needed */
+        }
+        .container {
+            display: flex;
+            flex-direction: column; /* Align items vertically top to bottom */
+            align-items: flex-start; /* Align items from the top */
+            height: 100vh;
+            justify-content: center; /* Center align vertically if needed */
+        }
+        button {
+            min-width: 150px;
+            margin: 5px 2px;
+            background-color: #7e1e86; /* Violet background color */
+            color: #fff;
+            border-radius: 2px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Find Dental Hospitals Near You</h1>
+    <p>Finding dental hospitals near your location...</p>
+    <div id="hospital-list"></div>
+    <script>
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the Earth in kilometers
+            const dLat = (lat2 - lat1) * (Math.PI / 180);
+            const dLon = (lon2 - lon1) * (Math.PI / 180);
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c; // Distance in kilometers
+            return distance.toFixed(2); // Return distance rounded to two decimal places
+        }
+        function findDentalHospitalsNearMe() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+        function showPosition(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const radius = 15000; // 15 kilometers (adjust as needed)
+
+            // Clear any previous hospital list
+            const hospitalList = document.getElementById("hospital-list");
+            hospitalList.innerHTML = '';
+
+            // Query the Overpass API for dental hospitals
+            const overpassQuery = `[out:json];node(around:${radius},${lat},${lon})["amenity"="dentist"];out;`;
+            fetch('https://overpass-api.de/api/interpreter', {
+                method: 'POST',
+                body: overpassQuery
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const dentalHospitals = data.elements;
+
+                    // Calculate distances for each hospital and store in an array
+                    const hospitalDistances = dentalHospitals.map(hospital => {
+                        const hospitalLat = hospital.lat;
+                        const hospitalLon = hospital.lon;
+                        const distance = calculateDistance(lat, lon, hospitalLat, hospitalLon);
+                        return { hospital, distance };
+                    });
+
+                    // Sort the hospitals by distance
+                    hospitalDistances.sort((a, b) => a.distance - b.distance);
+
+                    // Display only the closest 5 hospitals
+                    const closestHospitals = hospitalDistances.slice(0, 5);
+
+                    closestHospitals.forEach(({ hospital, distance }) => {
+                        const hospitalName = hospital.tags.name || "Dental Hospital";
+
+                        // Create a button to view the hospital's location on Google Maps
+                        const googleMapsButton = document.createElement("button");
+                        googleMapsButton.textContent = "View on Google Maps";
+                        googleMapsButton.onclick = function () {
+                            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hospitalName)}`;
+                            window.open(googleMapsUrl, "_blank");
+                        };
+
+                        // Create a paragraph to display hospital details
+                        const hospitalDetails = document.createElement("p");
+                        const breakLine = document.createElement("br");
+                        hospitalDetails.innerHTML = `<b>${hospitalName}</b> <br> Distance: <b>${distance} km</b>`;
+
+                        // Append the details and button to the hospital list
+                        hospitalList.appendChild(hospitalDetails);
+                        hospitalList.appendChild(googleMapsButton);
+                        hospitalList.appendChild(breakLine);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error fetching hospital data:", error);
+                });
+        }
+
+        // Call findDentalHospitalsNearMe when the page loads
+        findDentalHospitalsNearMe();
+    </script>
+    <a href="index.html">
+        <button>Back to home page</button>
+    </a>
+</body>
+</html>

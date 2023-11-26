@@ -1,0 +1,21 @@
+{
+    "name": "OralH - Hygiene monitor",
+    "short_name": "OralH",
+    "start_url":".",
+    "background_color": "#8d2659",
+    "theme_color":"#501733",
+    "display":"standalone",
+    "icons": [
+        {
+            "src":"images/logo.png",
+            "sizes": "192x192",
+            "type":"image/png"
+        },
+        {
+            "src":"images/logo.png",
+            "sizes": "512x512",
+            "type":"image/png"
+        }
+    ]
+
+}

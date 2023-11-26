@@ -14,10 +14,22 @@
 
 .header {
   text-align: center;
+  background-color: purple;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  padding: 10px; /* Adjust the padding as needed */
+  box-sizing: border-box;
 }
 
 .header p {
   margin: 5px 0;
+  color: white; /* Set text color to white or another suitable color */
+}
+
+.header h1 {
+  color: white;
 }
 
 .code {

@@ -20,13 +20,19 @@ const App = () => {
   const canvasRef = useRef(null);
 
   // model configs
-  const modelName = "yolov5n";
+  const modelName = "temp";
   const classThreshold = 0.2;
+
+  
+  function dis(){
+    var dis_class = sessionStorage.getItem('disease_class');
+    console.log(dis_class);
+  }
 
   useEffect(() => {
     tf.ready().then(async () => {
       const yolov5 = await tf.loadGraphModel(
-        `${window.location.href}/${modelName}_web_model/model.json`,
+        `${window.location.href}/${modelName}/model.json`,
         {
           onProgress: (fractions) => {
             setLoading({ loading: true, progress: fractions }); // set loading fractions
@@ -47,18 +53,17 @@ const App = () => {
       }); // set model & input shape
     });
   }, []);
-
   return (
     <div className="App">
-      {loading.loading && <Loader>Loading model... {(loading.progress * 100).toFixed(2)}%</Loader>}
+      {loading.loading && <Loader>Please wait as we load our oral detection module {(loading.progress * 100).toFixed(2)}%</Loader>}
       <div className="header">
-        <h1>📷 YOLOv5 Live Detection App</h1>
+        <h1>📷 Oral-H</h1>
         <p>
-          YOLOv5 live detection application on browser powered by <code>tensorflow.js</code>
+        Smile Bright, Stay Healthy! Discover Your Oral Health Journey with <code>OralH - Your Personal Oral Hygiene Companion</code>
         </p>
-        <p>
+        {/* <p>
           Serving : <code className="code">{modelName}</code>
-        </p>
+        </p> */}
       </div>
 
       <div className="content">
@@ -81,10 +86,25 @@ const App = () => {
         />
         <canvas width={model.inputShape[1]} height={model.inputShape[2]} ref={canvasRef} />
       </div>
-
-      <ButtonHandler imageRef={imageRef} cameraRef={cameraRef} videoRef={videoRef} />
+      
+      <ButtonHandler imageRef={imageRef} cameraRef={cameraRef} videoRef={videoRef} onClick="dis()"/>
+      {/* <div id="dis_class" display="none">
+        <p>
+          You seem to have : ${dis_class}
+        </p>
+      </div> */}
+      <p>
+        Need professional advice? Find a doctor near you who can help you....
+      </p>
+      <p>
+        Click below to find clinics near you!!
+      </p>
+      <a href="report.html">
+        <button>Find Clinics</button>
+      </a>
     </div>
   );
 };
+
 
 export default App;
