@@ -1,7 +1,7 @@
 # OralH - An oral hygiene monitor app
 
 <p align="center">
-  <img src="./sample.png" />
+  <img src="images/logo.png" />
 </p>
 
 ![love](https://img.shields.io/badge/Made%20with-🖤-white)
